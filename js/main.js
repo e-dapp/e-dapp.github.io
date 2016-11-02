@@ -115,7 +115,7 @@ var bPositions = [];
 var cPositions = [];
 var slots = [];
 var elevated = [];
-var elevation = 5;
+var elevation = 2.5;
 
 
 function initCubes() {
@@ -134,12 +134,13 @@ function initCubes() {
 				cubes.push( cube );
 				scene.add( cube );
 				cPositions.push( positions );
-				bPositions.push( positions );
 				
-				tempPos = [positions[0], positions[1] + elevation, positions[2]];
+				var baseTempPos = [positions[0], positions[1] - elevation, positions[2]];
+				var elTempPos = [positions[0], positions[1] + elevation, positions[2]];
 
-				elevated.push(tempPos);
-				slot.push(cube);
+				bPositions.push( baseTempPos );
+				elevated.push( elTempPos );
+				slot.push( cube );
 			}
 		}
 		slots.push(slot);
@@ -193,11 +194,15 @@ function checkAndElevate(elapsed) {
 		for (var i = 0; i < slots[j].length; i++) {
 			var index = slotBase + i;
 			if (j == getMouseLevel(mouse.y)) {
-				cPositions[index] = elevated[index];
+				cPositions[index][1] = 
+					interpolate(cPositions[index][1], elevated[index][1],
+						interpDur / (15), elapsed);
 				elevatedZ = cPositions[index][2];
 			}
-			else {
-				cPositions[index] = bPositions[index];
+			if (j != getMouseLevel(mouse.y)) {
+				cPositions[index][1] = 
+					interpolate(cPositions[index][1], bPositions[index][1],
+						interpDur / (10), elapsed);
 			}
 		}
 	}
